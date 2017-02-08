@@ -4,6 +4,8 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -42,6 +44,7 @@ public class EBSData {
     private String logFile = "";
     private String vlogFile = "";
     private Formatter simpleFormatter = null;
+    private StringWriter errors = new StringWriter();
     
     public EBSData(Logger LOG) throws IOException {
         //LOGG = LOG;        
@@ -60,7 +63,7 @@ public class EBSData {
    
     
     private void initializePropertyValues() throws FileNotFoundException,IOException{        
-        LOGG.log(Level.INFO,"Initializing connection properties .... ");
+        MyLogging.log(Level.INFO,"Initializing connection properties .... ");
         if (OS.contains("nix") || OS.contains("nux")) {
                 prop_file_path = "/usr/app/siebel/intg/intg.properties";
                 vlogFile = "ebsdata_nix_logfile";
@@ -82,23 +85,25 @@ public class EBSData {
             ApplicationDatabaseConnection adc = new ApplicationDatabaseConnection();
             conn = adc.connectToEBSDatabase();                  
             String selectTableSQL = "SELECT TERM_ID FROM APPS.RA_TERMS WHERE NAME = '"+term_name+"'";
-            LOGG.log(Level.INFO, "SELECT STATEMENT:{0}", selectTableSQL);
+            MyLogging.log(Level.INFO, "SELECT STATEMENT:{0}"+ selectTableSQL);
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(selectTableSQL);
             while (rs.next()) {
                 term_id = rs.getString("TERM_ID"); 
-                LOGG.log(Level.INFO, "TERM_ID:{0}", term_id);
+                MyLogging.log(Level.INFO, "TERM_ID:{0}"+ term_id);
             }            
         } catch (Exception ex) {
-            LOGG.log(Level.SEVERE, "ERROR IN connectToDatabase Method:",ex);
+            ex.printStackTrace(new PrintWriter(errors));
+            MyLogging.log(Level.SEVERE, "ERROR IN connectToDatabase Method:",errors.toString());
         } finally{
             try {
                 if(conn != null ){
                     conn.close();
                 }                
-                LOGG.log(Level.INFO, "Connection Closed:getEBSTermId");
+                MyLogging.log(Level.INFO, "Connection Closed:getEBSTermId");
             } catch (SQLException ex) {
-                LOGG.log(Level.SEVERE, "Error Connection close:getEBSTermId", ex);
+                ex.printStackTrace(new PrintWriter(errors));
+                MyLogging.log(Level.SEVERE, "Error Connection close:getEBSTermId", errors.toString());
             }
         }
         //return Integer.parseInt(term_id);
@@ -107,14 +112,14 @@ public class EBSData {
     
     
     public String getEBSCustTrxTypeId(String trx_type_name){
-        LOGG.log(Level.INFO, "getEBSCustTrxTypeId method ..");
+        MyLogging.log(Level.INFO, "getEBSCustTrxTypeId method ..");
         Connection conn = null;
         String trxTypeName = "";
         try {
             ApplicationDatabaseConnection adc = new ApplicationDatabaseConnection();
             conn = adc.connectToEBSDatabase();
             String selectTableSQL = "SELECT CUST_TRX_TYPE_ID FROM RA_CUST_TRX_TYPES_ALL WHERE NAME = '"+trx_type_name+"'";
-            LOGG.log(Level.INFO, "SELECT STATEMENT:{0}", selectTableSQL);
+            MyLogging.log(Level.INFO, "SELECT STATEMENT:{0}"+ selectTableSQL);
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(selectTableSQL);
             while (rs.next()) {
@@ -122,13 +127,15 @@ public class EBSData {
                 LOGG.log(Level.INFO, "CUST_TRX_TYPE_ID:{0}", trxTypeName);
             }
         } catch (Exception ex) {
-            LOGG.log(Level.SEVERE, "ERROR IN connectToDatabase Method:",ex);
+            ex.printStackTrace(new PrintWriter(errors));
+            MyLogging.log(Level.SEVERE, "ERROR IN connectToDatabase Method:",errors.toString());
         } finally{
             try {
                 conn.close();
-                LOGG.log(Level.INFO, "Connection Closed");
+                MyLogging.log(Level.INFO, "Connection Closed");
             } catch (SQLException ex) {
-                LOGG.log(Level.SEVERE, "Error Connection close", ex);
+                ex.printStackTrace(new PrintWriter(errors));
+                LOGG.log(Level.SEVERE, "Error Connection close", errors.toString());
             }
         }
         //return Integer.parseInt(trxTypeName);

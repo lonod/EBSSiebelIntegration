@@ -233,7 +233,7 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
           catch (SQLException ex)
           {
             ex.printStackTrace(new PrintWriter(errors));         
-        MyLogging.log(Level.SEVERE, "SQLException: ERROR", errors.toString());
+            MyLogging.log(Level.SEVERE, "SQLException: ERROR", errors.toString());
           }
         }        
       }
@@ -441,4 +441,3 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
         }
     }
 }
-

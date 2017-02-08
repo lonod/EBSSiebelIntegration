@@ -11,6 +11,8 @@
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,11 +34,11 @@ public class EBSItem {
   private Handler fileHandler = null;
   private Handler consoleHandler = null;
   private Formatter simpleFormatter = null;
-  
+  private StringWriter errors = new StringWriter();
   public EBSItem(String vLogFile)
   {
     this.vLogFile = vLogFile;
-    initLogging(this.vLogFile);
+    //initLogging(this.vLogFile);
   }
   
   private void initLogging(String vLogFile)
@@ -56,7 +58,8 @@ public class EBSItem {
     }
     catch (IOException ie)
     {
-      LOG.log(Level.SEVERE, "EBSItem(initLogging): ERROR", ie);
+        ie.printStackTrace(new PrintWriter(errors));
+        MyLogging.log(Level.SEVERE, "EBSItem(initLogging): ERROR", errors.toString());
     }
   }
   
@@ -65,9 +68,9 @@ public class EBSItem {
   {
     ApplicationDatabaseConnection adc = new ApplicationDatabaseConnection();
     Connection conn = adc.connectToEBSDatabase();
-    LOG.log(Level.INFO, "Connected to EBS Database");
+    MyLogging.log(Level.INFO, "Connected to EBS Database");
     String sql_query = "SELECT count(INVENTORY_ITEM_ID) AS ITEM_COUNT FROM MTL_SYSTEM_ITEMS_B WHERE ORGANIZATION_ID ='" + itemOrgId + "' AND  INVENTORY_ITEM_ID = '" + itemNumber + "'";
-    LOG.log(Level.INFO, "sql_query:{0}", sql_query);
+    MyLogging.log(Level.INFO, "sql_query:{0}"+ sql_query);
     Statement statement = conn.createStatement();
     ResultSet rs = statement.executeQuery(sql_query);
     
@@ -75,7 +78,7 @@ public class EBSItem {
     while (rs.next())
     {
       nItem_count = rs.getInt("ITEM_COUNT");
-      LOG.log(Level.INFO, "ITEM_COUNT:{0}", Integer.valueOf(nItem_count));
+      MyLogging.log(Level.INFO, "ITEM_COUNT:{0}"+ Integer.valueOf(nItem_count));
     }
     if (!conn.isClosed()) {
       conn.close();

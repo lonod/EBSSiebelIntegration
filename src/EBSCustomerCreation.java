@@ -9,6 +9,7 @@
  * @author SAP Training
  */
 
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +18,7 @@ public class EBSCustomerCreation {
     static int user_id ;
     static int resp_id;
     int trx_header_id;
+    StringWriter errors = new StringWriter();
 
     public EBSCustomerCreation(Logger LOGG) {
         LOG = LOGG;
@@ -30,7 +32,7 @@ public class EBSCustomerCreation {
     }
     
     public String createCustomerSQLHeader(String customerName, String customerNumber,String customerClassification){
-        LOG.log(Level.INFO, "in createCustomerSQLHeader...");
+        MyLogging.log(Level.INFO, "in createCustomerSQLHeader...");
         String sqlscriptHeader = "DECLARE\n" +
                " p_cust_account_rec     HZ_CUST_ACCOUNT_V2PUB.CUST_ACCOUNT_REC_TYPE;\n" +
                " p_organization_rec     HZ_PARTY_V2PUB.ORGANIZATION_REC_TYPE;\n" +
@@ -59,7 +61,7 @@ public class EBSCustomerCreation {
     }
     
      public String createCustomerSQLBody(){
-         LOG.log(Level.INFO, "in createCustomerSQLBody...");
+         MyLogging.log(Level.INFO, "in createCustomerSQLBody...");
          String sqlScriptBody = "HZ_CUST_ACCOUNT_V2PUB.CREATE_CUST_ACCOUNT\n" +
 "             (\n" +
 "              p_init_msg_list       => FND_API.G_TRUE,\n" +

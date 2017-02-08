@@ -1,6 +1,8 @@
 
 import com.siebel.data.SiebelException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -23,6 +25,7 @@ public class EBSInvoiceCreation {
     static int user_id ;
     static int resp_id;
     int trx_header_id;
+    private StringWriter errors = new StringWriter();
     
     public EBSInvoiceCreation(Logger LOGG) {
         LOG = LOGG;
@@ -36,7 +39,7 @@ public class EBSInvoiceCreation {
     }
     
     public String createInvoiceSQLScriptHeader(){
-        LOG.log(Level.INFO, "createInvoiceSQLScriptHeader...");
+        MyLogging.log(Level.INFO, "createInvoiceSQLScriptHeader...");
         String sqlscriptHeader = "DECLARE\n" +
         "l_customer_trx_id number;\n" +
         "l_return_status     varchar2(1);\n" +
@@ -59,7 +62,7 @@ public class EBSInvoiceCreation {
     
     
     public String createInvoiceHeader(int bill_to_customer_id,int cust_trx_type_id,int primary_salesrep_id, String trx_currency){        
-        LOG.log(Level.INFO, "createInvoiceHeader...");
+        MyLogging.log(Level.INFO, "createInvoiceHeader...");
         String invoiceHeader = "fnd_global.apps_initialize("+user_id+", "+resp_id+", 222,0);        \n" +
         "	  mo_global.init ('AR');   \n" +
         "      l_trx_header_tbl(1).trx_header_id := "+trx_header_id+";     \n" +
@@ -87,7 +90,8 @@ public class EBSInvoiceCreation {
             EBSData ed = new EBSData(LOG);
             term_id = ed.getEBSTermId(term_name);            
         } catch (IOException ex) {
-            Logger.getLogger(EBSInvoiceCreation.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace(new PrintWriter(errors));
+            MyLogging.log(Level.SEVERE, "InvoiceCreateion: createInvoiceOrderItemsBody", errors.toString());
         }
         
         SiebelService ss = new SiebelService();
@@ -116,14 +120,15 @@ public class EBSInvoiceCreation {
                 }
             }
         } catch (SiebelException ex) {
-            Logger.getLogger(EBSInvoiceCreation.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace(new PrintWriter(errors));
+            MyLogging.log(Level.SEVERE, "InvoiceCreateion: createInvoiceOrderItemsBody", errors.toString());
         }
         return finvoiceItemsBody;
     }
     
     
     public String createInvoiceQuoteItemsBody(String quote_id, String term_name){
-        LOG.log(Level.INFO, "createInvoiceQuoteItemsBody...");
+        MyLogging.log(Level.INFO, "createInvoiceQuoteItemsBody...");
         String Product;
         String Quantity;
         String ItemPriceDisplay;
@@ -138,7 +143,8 @@ public class EBSInvoiceCreation {
             EBSData ed = new EBSData(LOG);
             term_id = ed.getEBSTermId(term_name);            
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Exception in getEBSTermId", ex);
+            ex.printStackTrace(new PrintWriter(errors));
+            MyLogging.log(Level.SEVERE, "InvoiceCreateion: getEBSTermId", errors.toString());            
         }
         
         SiebelService ss = new SiebelService();
@@ -173,7 +179,8 @@ public class EBSInvoiceCreation {
                 }
             }
         } catch (SiebelException ex) {
-            Logger.getLogger(EBSInvoiceCreation.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace(new PrintWriter(errors));
+            MyLogging.log(Level.SEVERE, "InvoiceCreateion: getEBSTermId", errors.toString());            
         }
         return finvoiceItemsBody;
     }
