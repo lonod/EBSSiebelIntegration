@@ -42,6 +42,8 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
     private String ECSCode = null;
     private String Item_Id = null;
     private String Org_Id = null;
+    private String warehouse_id = null;
+    private String item_number = null;
     private BufferedWriter bw = null;
     private String vProcedureWithParameters = null;
     private Connection conn = null;
@@ -121,16 +123,18 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
             MyLogging.log(Level.INFO, "custLogFile:{0}" + this.custLogFile);
             this.fl.writeToLog(this.logfile, this.custLogFile, "CallOnHandQty Start");
             this.Item_Id = input.getProperty("item_id");
-            this.Org_Id = input.getProperty("org_id");
-            MyLogging.log(Level.INFO, "Item_Id: {0}", this.Item_Id);
+            this.item_number = input.getProperty("item_number");
+            this.warehouse_id = input.getProperty("warehouse_id");
+            MyLogging.log(Level.INFO, "Item_Id: {0}"+ this.Item_Id);
+            MyLogging.log(Level.INFO, "item_number: {0}"+ this.item_number);
             this.fl.writeToLog(this.logfile, this.custLogFile, "Item_Id:" + this.Item_Id);
-            MyLogging.log(Level.INFO, "Org_Id: {0}", this.Org_Id);
+            MyLogging.log(Level.INFO, "warehouse_id: {0}"+ this.warehouse_id);
             this.fl.writeToLog(this.logfile, this.custLogFile, "Org_Id:" + this.Org_Id);
             try {
                 this.fl.writeToLog(this.logfile, this.custLogFile, "Calling :EBSOnHandQty");
                 EBSOnHandQty ehq = new EBSOnHandQty(this.Item_Id, this.Org_Id, this.onHandLogFile);
                 this.fl.writeToLog(this.logfile, this.custLogFile, "Calling :callViewQuery");
-                ehq.callViewQuery(this.Item_Id, this.Org_Id);
+                ehq.callViewQuery(this.Item_Id, this.item_number,this.warehouse_id);
             }
             catch (Exception e) {
                 MyLogging.log(Level.SEVERE, "ERROR IN CallOnHandQty Method:", new RuntimeException("Error"));
@@ -433,7 +437,8 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
             SiebelPropertySet output = new SiebelPropertySet();
             EBSSiebelIntegration ns = new EBSSiebelIntegration();
             input.setProperty("item_id", "14");
-            input.setProperty("org_id", "123");
+            input.setProperty("item_number","131628");
+            input.setProperty("warehouse_id", "123");
             ns.doInvokeMethod("CallOnHandQty", input, output);
         }
         catch (Exception ex) {
