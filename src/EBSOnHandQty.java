@@ -77,12 +77,12 @@ public class EBSOnHandQty {
     }
   }
   
-  public void callViewQuery(String item_id, String org_id)
+  public void callViewQuery(String item_id, String item_number,String warehouse_id)
   {
     MyLogging.log(Level.INFO, "entering:" + getClass().getName() + "callViewQuery");
     ApplicationDatabaseConnection adc = new ApplicationDatabaseConnection();
     Connection conn = adc.connectToSiebelDatabase();
-    String queryString = "SELECT\n      T1.TABLE_ID,\n      T1.CATEGORY,\n      T1.WAREHOUSE_ID,\n      T1.WAREHOUSE,\n      T1.ITEM_ID,\n      T1.ITEM,\n      T1.ITEM_DESCRIPTION,\n      T1.PRIMARY_QUANTITY,\n      T1.ONHAND_STATUS,\n      T1.PRIMARY_UOM,\n      T1.CONTAINERIZED_FLAG,\n      T1.SUBINVENTORY,\n      T1.REVISION,\n      T1.LPN,\n      T1.PARENT_LPN,\n      T1.SERIAL,\n      T1.LOT,\n      T1.SECONDARY_UOM,\n      T1.SECONDARY_QUANTITY,\n      T1.LOCATOR,\n      T1.SNAPSHOT_DATE\n   FROM \n       INV.MTL_ONHAND_SYNC_V2@SIEBEL_TO_EBS T1\n   WHERE \n      (T1.ITEM_ID = '" + item_id + "' AND T1.WAREHOUSE_ID = '" + org_id + "')";
+    String queryString = "SELECT\n      T1.TABLE_ID,\n      T1.CATEGORY,\n      T1.WAREHOUSE_ID,\n      T1.WAREHOUSE,\n      T1.ITEM_ID,\n      T1.ITEM,\n      T1.ITEM_DESCRIPTION,\n      T1.PRIMARY_QUANTITY,\n      T1.ONHAND_STATUS,\n      T1.PRIMARY_UOM,\n      T1.CONTAINERIZED_FLAG,\n      T1.SUBINVENTORY,\n      T1.REVISION,\n      T1.LPN,\n      T1.PARENT_LPN,\n      T1.SERIAL,\n      T1.LOT,\n      T1.SECONDARY_UOM,\n      T1.SECONDARY_QUANTITY,\n      T1.LOCATOR,\n      T1.SNAPSHOT_DATE\n   FROM \n       INV.MTL_ONHAND_SYNC_V2@SIEBEL_TO_EBS T1\n   WHERE \n      (T1.ITEM = '" + item_number + "' AND T1.WAREHOUSE_ID = '" + warehouse_id + "')";
     
     MyLogging.log(Level.INFO, "OnHandQuery is {0}:" + queryString);
     try
@@ -105,8 +105,8 @@ public class EBSOnHandQty {
         MyLogging.log(Level.INFO, "TABLE_ID :{0}" + tableId);
         String category = rs.getString("CATEGORY");
         MyLogging.log(Level.INFO, "category :{0}" + category);
-        String warehouse_id = rs.getString("WAREHOUSE_ID");
-        MyLogging.log(Level.INFO, "warehouse_id :{0}" + warehouse_id);
+        String the_warehouse_id = rs.getString("WAREHOUSE_ID");
+        MyLogging.log(Level.INFO, "warehouse_id :{0}" + the_warehouse_id);
         String warehouse = rs.getString("WAREHOUSE");
         MyLogging.log(Level.INFO, "warehouse :{0}" + warehouse);
         String v_item_id = rs.getString("ITEM_ID");
@@ -120,7 +120,7 @@ public class EBSOnHandQty {
         String onhand_status = rs.getString("ONHAND_STATUS");
         MyLogging.log(Level.INFO, "onhand_status :{0}" + onhand_status);
         
-        String insertQuery = "INSERT INTO EBS_CUST_ONHAND_QTY (TABLE_ID, CATEGORY, WAREHOUSE_ID, WAREHOUSE,ITEM_ID,ITEM,ITEM_DESCRIPTION,PRIMARY_QUANTITY,ONHAND_STATUS) VALUES\n('" + tableId + "','" + category + "','" + warehouse_id + "','" + warehouse + "','" + v_item_id + "','" + item + "','" + item_description + "','" + primary_quantity + "','" + onhand_status + "')";
+        String insertQuery = "INSERT INTO EBS_CUST_ONHAND_QTY (TABLE_ID, CATEGORY, WAREHOUSE_ID, WAREHOUSE,ITEM_ID,ITEM,ITEM_DESCRIPTION,PRIMARY_QUANTITY,ONHAND_STATUS) VALUES\n('" + tableId + "','" + category + "','" + the_warehouse_id + "','" + warehouse + "','" + v_item_id + "','" + item + "','" + item_description + "','" + primary_quantity + "','" + onhand_status + "')";
         
         MyLogging.log(Level.INFO, "insertQuery :{0}" + insertQuery);
         insertStatement.executeUpdate(insertQuery);
@@ -163,6 +163,6 @@ public class EBSOnHandQty {
   public static void main(String[] args)
   {
     EBSOnHandQty ohv = new EBSOnHandQty("13002", "124", "C:\\temp\\intg\\log\\OnHandLog.log");
-    ohv.callViewQuery("14", "123");
+    ohv.callViewQuery("14","131628", "123");
   }
 }
