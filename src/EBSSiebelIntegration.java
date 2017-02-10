@@ -82,6 +82,7 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
+  @Override
     public void doInvokeMethod(String MethodName, SiebelPropertySet input, SiebelPropertySet output) throws SiebelBusinessServiceException {
         String err_msg;
         try {
@@ -253,7 +254,7 @@ public class EBSSiebelIntegration extends SiebelBusinessService{
       }
       catch (Exception ex)
       {
-          ex.printStackTrace(new PrintWriter(errors));  
+        ex.printStackTrace(new PrintWriter(errors));  
         MyLogging.log(Level.SEVERE, "CreateInvoice: ERROR", errors.toString());
       }
       finally
