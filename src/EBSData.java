@@ -147,11 +147,15 @@ public class EBSData {
             Logger dLOGS = Logger.getLogger(EBSData.class.getName());
             EBSData ed = new EBSData(dLOGS);
             String term_id = ed.getEBSTermId("30 NET");
-            LOGG.log(Level.INFO, "TERM_ID:{0}", term_id);
+            MyLogging.log(Level.INFO, "TERM_ID:{0}", term_id);            
             String cust_trx_type_id = ed.getEBSCustTrxTypeId("SPAREPART NONDEALER");
-            LOGG.log(Level.INFO, "cust_trx_type_id:{0}", cust_trx_type_id);
-        } catch (IOException ex) {
-            LOGG.log(Level.SEVERE, null, ex);
+            MyLogging.log(Level.INFO, "cust_trx_type_id:{0}", cust_trx_type_id);
+        } catch (Exception ex) {
+            StringWriter error = new StringWriter();
+            ex.printStackTrace(new PrintWriter(error));
+            MyLogging.log(Level.SEVERE, "Error :"+ error.toString());
+            System.out.println("foo");
+            
         }
         
     }
